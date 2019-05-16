@@ -2,8 +2,8 @@ package guru.springframework;
 
 public class Money implements Expression{
 
-    protected int amount;
-    protected String currency;
+    int amount;
+    private String currency;
 
 
     public Money(int amount, String currency) {
@@ -11,25 +11,31 @@ public class Money implements Expression{
         this.currency = currency;
     }
 
-    public  Money times(int multiplier) {
+    @Override
+    public  Expression times(int multiplier) {
         return new Money(amount*multiplier, this.currency);
-    };
+    }
 
-    protected String currency() {
+    String currency() {
         return currency;
     }
 
 
-    public static Money dollar(int amount) {
+     static Money dollar(int amount) {
         return new Money(amount, "USD");
     }
 
-    public static Money franc(int amount) {
+    static Money franc(int amount) {
         return new Money(amount, "CHF");
     }
 
-    public Money reduce(String toCurrency) {
-        return this;
+    public Money reduce(Bank bank, String toCurrency) {
+        return new Money(amount / bank.rate(this.currency, toCurrency), toCurrency);
+    }
+
+
+    public Expression plus(Expression addend){
+        return new Sum(this,addend);
     }
 
     public boolean equals(Object object) {
@@ -47,7 +53,4 @@ public class Money implements Expression{
                 '}';
     }
 
-    public Expression plus(Money augmend) {
-        return new Sum(this,augmend );
-    }
 }
